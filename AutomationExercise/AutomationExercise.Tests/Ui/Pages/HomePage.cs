@@ -39,6 +39,8 @@ namespace AutomationExercise.Tests.Ui.Pages
         public async Task OpenAsync()
         {
             await this.page.GotoAsync("/");
+
+            await this.CloseAdIfPresentAsync();
         }
 
         /// <summary>
@@ -58,6 +60,11 @@ namespace AutomationExercise.Tests.Ui.Pages
         public async Task<ProductsPage> GoToProductsAsync()
         {
             await this.ProductsLink.ClickAsync();
+
+            await this.CloseAdIfPresentAsync();
+
+            await this.page.WaitForURLAsync("**/products");
+
             return new ProductsPage(this.page);
         }
 
@@ -74,6 +81,29 @@ namespace AutomationExercise.Tests.Ui.Pages
             return loggedInText
                 .Replace("Logged in as", string.Empty)
                 .Trim();
+        }
+
+        private async Task CloseAdIfPresentAsync()
+        {
+            if (!this.page.Url.Contains(
+                "#google_vignette",
+                StringComparison.OrdinalIgnoreCase))
+            {
+                return;
+            }
+
+            foreach (var frame in this.page.Frames)
+            {
+                var closeButton = frame.GetByRole(
+                    AriaRole.Button,
+                    new() { Name = "Close ad" });
+
+                if (await closeButton.IsVisibleAsync())
+                {
+                    await closeButton.ClickAsync();
+                    return;
+                }
+            }
         }
     }
 }

@@ -65,7 +65,7 @@ namespace AutomationExercise.Tests.Ui.Pages
             string productName)
         {
             var productCard = this.page
-                .Locator(".single-products")
+                .Locator(".product-image-wrapper")
                 .Filter(new() { HasText = productName });
 
             await productCard
