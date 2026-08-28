@@ -83,6 +83,20 @@ namespace AutomationExercise.Tests.Ui.Pages
                 .Trim();
         }
 
+        /// <summary>
+        /// Verifies that the expected username is displayed for the logged-in user.
+        /// </summary>
+        /// <param name="expectedUsername">The expected username.</param>
+        /// <returns>A task representing the asynchronous operation.</returns>
+        public async Task ExpectLoggedInUsernameAsync(
+            string expectedUsername)
+        {
+            var loggedInUser = this.page.GetByText(
+                $"Logged in as {expectedUsername}");
+
+            await Assertions.Expect(loggedInUser).ToBeVisibleAsync();
+        }
+
         private async Task CloseAdIfPresentAsync()
         {
             if (!this.page.Url.Contains(

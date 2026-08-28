@@ -4,8 +4,10 @@
 
 namespace AutomationExercise.Tests.Tests
 {
+    using AutomationExercise.Tests.Api.Constants;
     using AutomationExercise.Tests.Fixtures;
     using AutomationExercise.Tests.Ui.Pages;
+    using AutomationExercise.Tests.Validators;
     using NUnit.Framework;
 
     /// <summary>
@@ -25,13 +27,7 @@ namespace AutomationExercise.Tests.Tests
             var productsResponse =
                 await this.ApiClient.GetProductsAsync();
 
-            Assert.That(
-                productsResponse.ResponseCode,
-                Is.EqualTo(200));
-
-            Assert.That(
-                productsResponse.Products,
-                Is.Not.Empty);
+            Validator.ValidateProductsResponse(productsResponse);
 
             var expectedProduct =
                 productsResponse.Products.First();
@@ -46,13 +42,8 @@ namespace AutomationExercise.Tests.Tests
             await productsPage.SearchAsync(
                 expectedProduct.Name);
 
-            var productIsVisible =
-                await productsPage.IsProductVisibleAsync(
-                    expectedProduct.Name);
-
-            Assert.That(
-                productIsVisible,
-                Is.True);
+            await productsPage.ExpectProductVisibleAsync(
+                expectedProduct.Name);
 
             var productDetailsPage =
                 await productsPage.OpenProductAsync(
@@ -64,16 +55,10 @@ namespace AutomationExercise.Tests.Tests
             var actualPrice =
                 await productDetailsPage.GetPriceAsync();
 
-            Assert.Multiple(() =>
-            {
-                Assert.That(
-                    actualName,
-                    Is.EqualTo(expectedProduct.Name));
-
-                Assert.That(
-                    actualPrice,
-                    Is.EqualTo(expectedProduct.Price));
-            });
+            Validator.ValidateProductDetails(
+                expectedProduct,
+                actualName,
+                actualPrice);
         }
     }
 }

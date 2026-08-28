@@ -1,0 +1,37 @@
+name: CI
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    defaults:
+      run:
+        working-directory: AutomationExercise
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 8.0.x
+
+      - name: Restore
+        run: dotnet restore AutomationExercise.sln
+
+      - name: Verify formatting
+        run: dotnet format AutomationExercise.sln --verify-no-changes --no-restore
+
+      - name: Build
+        run: dotnet build AutomationExercise.sln --configuration Release --no-restore
+
+      - name: Install Playwright browsers
+        run: pwsh AutomationExercise.Tests/bin/Release/net8.0/playwright.ps1 install --with-deps chromium
+
+      - name: Test
+        run: dotnet test AutomationExercise.sln --configuration Release --no-build

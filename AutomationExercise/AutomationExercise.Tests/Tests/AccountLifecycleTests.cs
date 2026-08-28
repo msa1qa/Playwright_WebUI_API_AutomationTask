@@ -4,9 +4,12 @@
 
 namespace AutomationExercise.Tests.Tests
 {
+    using AutomationExercise.Tests.Api.Constants;
+    using AutomationExercise.Tests.Api.Models;
     using AutomationExercise.Tests.Fixtures;
     using AutomationExercise.Tests.TestData;
     using AutomationExercise.Tests.Ui.Pages;
+    using AutomationExercise.Tests.Validators;
     using NUnit.Framework;
 
     /// <summary>
@@ -23,42 +26,23 @@ namespace AutomationExercise.Tests.Tests
         public async Task AccountCreatedThroughApiCanBeVerifiedThroughUi()
         {
             var account = TestDataFactory.CreateAccount();
-            var accountCreated = false;
 
             try
             {
                 var createResponse =
                     await this.ApiClient.CreateAccountAsync(account);
 
-                accountCreated =
-                    createResponse.ResponseCode == 201;
+                account.IsCreated =
+                    createResponse.ResponseCode == (int)ApiResponseCode.Created;
 
-                Assert.Multiple(() =>
-                {
-                    Assert.That(
-                        createResponse.ResponseCode,
-                        Is.EqualTo(201));
-
-                    Assert.That(
-                        createResponse.Message,
-                        Is.EqualTo("User created!"));
-                });
+                Validator.ValidateAccountCreation(createResponse);
 
                 var verifyResponse =
                     await this.ApiClient.VerifyLoginAsync(
                         account.Email,
                         account.Password);
 
-                Assert.Multiple(() =>
-                {
-                    Assert.That(
-                        verifyResponse.ResponseCode,
-                        Is.EqualTo(200));
-
-                    Assert.That(
-                        verifyResponse.Message,
-                        Is.EqualTo("User exists!"));
-                });
+                Validator.ValidateLoginVerification(verifyResponse);
 
                 var homePage = new HomePage(this.Page);
 
@@ -71,16 +55,12 @@ namespace AutomationExercise.Tests.Tests
                     account.Email,
                     account.Password);
 
-                var displayedUsername =
-                    await homePage.GetLoggedInUsernameAsync();
-
-                Assert.That(
-                    displayedUsername,
-                    Is.EqualTo(account.Name));
+                await homePage.ExpectLoggedInUsernameAsync(
+                    account.Name);
             }
             finally
             {
-                if (accountCreated)
+                if (account.IsCreated)
                 {
                     await this.ApiClient.DeleteAccountAsync(
                         account.Email,

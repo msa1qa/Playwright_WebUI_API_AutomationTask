@@ -13,7 +13,7 @@ namespace AutomationExercise.Tests.Fixtures
     /// <summary>
     /// Provides common Playwright UI and API setup for tests.
     /// </summary>
-    public class TestBase : PageTest
+    public abstract class TestBase : PageTest
     {
         private IAPIRequestContext? apiRequestContext;
 

@@ -93,5 +93,10 @@ namespace AutomationExercise.Tests.Api.Models
         /// Gets the user's mobile phone number.
         /// </summary>
         public string MobileNumber { get; init; } = "5551234567";
+
+        /// <summary>
+        /// Gets or sets a value indicating whether the account was successfully created.
+        /// </summary>
+        public bool IsCreated { get; set; }
     }
 }

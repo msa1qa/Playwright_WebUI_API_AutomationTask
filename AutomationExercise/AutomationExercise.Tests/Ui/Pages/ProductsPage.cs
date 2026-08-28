@@ -40,20 +40,17 @@ namespace AutomationExercise.Tests.Ui.Pages
         }
 
         /// <summary>
-        /// Determines whether the specified product is visible.
+        /// Verifies that the specified product is visible in the search results.
         /// </summary>
         /// <param name="productName">The product name.</param>
-        /// <returns>
-        /// <see langword="true"/> when the product is visible;
-        /// otherwise, <see langword="false"/>.
-        /// </returns>
-        public async Task<bool> IsProductVisibleAsync(
-            string productName)
+        /// <returns>A task representing the asynchronous operation.</returns>
+        public async Task ExpectProductVisibleAsync(string productName)
         {
-            return await this.page
+            var product = this.page
                 .Locator(".productinfo")
-                .Filter(new() { HasText = productName })
-                .IsVisibleAsync();
+                .Filter(new() { HasText = productName });
+
+            await Assertions.Expect(product).ToBeVisibleAsync();
         }
 
         /// <summary>
